@@ -12,7 +12,11 @@ interface TranslationRequest {
 }
 
 interface AIResponse {
-  response?: string;
+  choices: {
+    message: {
+      content: string;
+    };
+  }[];
 }
 
 export async function translate(request: Request, env: Env): Promise<Response> {
@@ -66,7 +70,7 @@ Instructions:
 `.trim();
 
   try {
-    const result = (await env.AI.run(body.model, {
+    const result = await env.AI.run(body.model, {
       messages: [
         {
           role: "system",
@@ -77,10 +81,10 @@ Instructions:
           content: prompt,
         },
       ],
-    })) as AIResponse;
+    });
 
     return Response.json({
-      translation: result,
+      translation: (result as unknown as AIResponse).choices[0].message.content,
       original: lastMessage.text,
       model: body.model,
     });
