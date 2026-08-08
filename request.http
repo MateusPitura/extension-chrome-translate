@@ -1,0 +1,23 @@
+###
+POST https://messages-translator.mateuspitura.workers.dev/translate HTTP/1.1
+content-type: application/json
+
+{
+    "model": "@cf/openai/gpt-oss-120b",
+    "inputLanguage": "Spanish [Spain]",
+    "outputLanguage": "Portuguese [Brazil]",
+    "messages": [
+      {
+        "sender": "John",
+        "text": "Hola, ¿cómo estás?"
+      },
+      {
+        "sender": "Jane",
+        "text": "Estoy bien, gracias. ¿Y tú?"
+      },
+      {
+        "sender": "John",
+        "text": "Estoy bien también. ¿Qué has estado haciendo últimamente?"
+      }
+    ]
+}
