@@ -1,6 +1,8 @@
 import { TRANSLATE_SVG } from "./constants/svgs/translate";
 import { Message } from "./types";
+import { addTranslationInput } from "./utils/addTranslationInput";
 import { appendTranslation } from "./utils/appendTranslation";
+import { getMessages } from "./utils/getMessages";
 import { getMessagesElement } from "./utils/getMessagesElement";
 import { getSender } from "./utils/getSender";
 import { getText } from "./utils/getText";
@@ -35,20 +37,7 @@ function main() {
     button.addEventListener("click", async (event) => {
       event.stopPropagation();
 
-      const messagesElementAux = getMessagesElement();
-
-      const messagesFormatted: Message[] = [];
-      for (const messageElementAux of messagesElementAux) {
-        try {
-          messagesFormatted.push({
-            sender: getSender(messageElementAux),
-            text: getText(messageElementAux),
-            element: messageElementAux,
-          });
-        } catch {
-          continue;
-        }
-      }
+      const messagesFormatted = getMessages();
 
       const currentMessageIndex = messagesFormatted.findIndex(
         (message) =>
@@ -74,6 +63,8 @@ function main() {
       }
     });
   }
+
+  addTranslationInput();
 }
 
 const observer = new MutationObserver(() => {

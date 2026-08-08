@@ -1,6 +1,10 @@
-import { Message } from "@src/types";
+import { Language, Message } from "@src/types";
 
-export async function translateMessage(messages: Message[]): Promise<string> {
+export async function translateMessage(
+  messages: Message[],
+  inputLanguage: Language,
+  outputLanguage: Language,
+): Promise<string> {
   const response = await fetch(
     "https://messages-translator.mateuspitura.workers.dev/translate",
     {
@@ -10,8 +14,8 @@ export async function translateMessage(messages: Message[]): Promise<string> {
       },
       body: JSON.stringify({
         model: "@cf/openai/gpt-oss-120b",
-        inputLanguage: "Spanish [Spain]",
-        outputLanguage: "Portuguese [Brazil]",
+        inputLanguage,
+        outputLanguage,
         messages: messages.map((message) => ({
           sender: message.sender.onlyName,
           text: message.text,
