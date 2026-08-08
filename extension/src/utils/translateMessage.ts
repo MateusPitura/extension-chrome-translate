@@ -1,12 +1,6 @@
 import { Message } from "@src/types";
 
-export async function translateMessage(
-  messages: Message[],
-): Promise<string> {
-  console.log(
-    "🌠 messages: ",
-    messages.map((message) => message.text),
-  );
+export async function translateMessage(messages: Message[]): Promise<string> {
   const response = await fetch(
     "https://messages-translator.mateuspitura.workers.dev/translate",
     {

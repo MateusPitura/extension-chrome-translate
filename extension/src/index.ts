@@ -1,7 +1,9 @@
 import { Message } from "./types";
+import { appendTranslation } from "./utils/appendTranslation";
 import { getMessagesElement } from "./utils/getMessagesElement";
 import { getSender } from "./utils/getSender";
 import { getText } from "./utils/getText";
+import { getTranslationFromLocalStorage } from "./utils/localStorage";
 import { onClickTranslateMessage } from "./utils/onClickTranslateMessage";
 
 const BUTTON_ELEMENT_CLASS = "my-reader-button";
@@ -17,6 +19,17 @@ function main() {
     const button = document.createElement("button");
     button.className = BUTTON_ELEMENT_CLASS;
     button.textContent = "📖";
+    let currentMessage: Message;
+
+    try {
+      currentMessage = {
+        sender: getSender(messageElement),
+        text: getText(messageElement),
+        element: messageElement,
+      };
+    } catch {
+      continue;
+    }
 
     button.addEventListener("click", (event) => {
       event.stopPropagation();
@@ -36,12 +49,6 @@ function main() {
         }
       }
 
-      const currentMessage = {
-        sender: getSender(messageElement),
-        text: getText(messageElement),
-        element: messageElement,
-      };
-
       const currentMessageIndex = messagesFormatted.findIndex(
         (message) =>
           message.sender.raw === currentMessage.sender.raw &&
@@ -58,6 +65,11 @@ function main() {
     });
 
     messageElement.appendChild(button);
+    getTranslationFromLocalStorage(currentMessage).then((translation) => {
+      if (translation) {
+        appendTranslation(currentMessage, translation);
+      }
+    });
   }
 }
 

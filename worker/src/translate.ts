@@ -62,6 +62,7 @@ ${conversation}
 Instructions:
 - Translate only the LAST message.
 - Use the previous messages as context.
+- Also translate messages with errors or typos
 - Preserve the original meaning and tone.
 - Keep slang and informal language natural.
 - Do not translate people's names.
