@@ -1,4 +1,5 @@
 import { Message } from "./types";
+import { getMessagesElement } from "./utils/getMessagesElement";
 import { getSender } from "./utils/getSender";
 import { getText } from "./utils/getText";
 import { onClickTranslateMessage } from "./utils/onClickTranslateMessage";
@@ -6,12 +7,9 @@ import { onClickTranslateMessage } from "./utils/onClickTranslateMessage";
 const BUTTON_ELEMENT_CLASS = "my-reader-button";
 
 function main() {
-  const messagesElement = document.querySelectorAll(
-    '[data-testid="msg-container"]',
-  );
+  const messagesElement = getMessagesElement();
 
-  for (const messageElementIndex in messagesElement) {
-    const messageElement = messagesElement[messageElementIndex] as HTMLElement;
+  for (const messageElement of messagesElement) {
     if (messageElement.querySelector(`.${BUTTON_ELEMENT_CLASS}`)) {
       continue;
     }
@@ -23,16 +21,10 @@ function main() {
     button.addEventListener("click", (event) => {
       event.stopPropagation();
 
-      const messagesElementAux = document.querySelectorAll(
-        '[data-testid="msg-container"]',
-      );
+      const messagesElementAux = getMessagesElement();
 
       const messagesFormatted: Message[] = [];
-      for (const messageElementAuxIndex in messagesElementAux) {
-        const messageElementAux = messagesElementAux[
-          messageElementAuxIndex
-        ] as HTMLElement;
-
+      for (const messageElementAux of messagesElementAux) {
         try {
           messagesFormatted.push({
             sender: getSender(messageElementAux),

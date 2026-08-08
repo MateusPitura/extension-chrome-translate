@@ -1,9 +1,9 @@
 export function getText(messageElement: HTMLElement): string {
   const selectableTexts = [
-    ...messageElement.querySelectorAll('[data-testid="selectable-text"]'),
+    ...messageElement.querySelectorAll(".selectable-text"),
   ].filter(
     (element) => !element.closest('[data-testid="quoted-message"]'),
   ) as HTMLElement[];
 
-  return selectableTexts.map((element) => element.innerText).join("\n");
+  return selectableTexts[0].innerText;
 }
