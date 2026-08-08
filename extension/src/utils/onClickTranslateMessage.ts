@@ -1,25 +1,24 @@
-import { getContent } from "./getContent";
-import { getSender } from "./getSender";
+import { Message } from "@src/types";
 import { translateMessage } from "./translateMessage";
 
 const TRANSLATION_ELEMENT_CLASS = "my-reader-translation";
 
-export async function onClickTranslateMessage(messageElement: HTMLElement) {
-  let translationElement = messageElement.querySelector(
+export async function onClickTranslateMessage(
+  message: Message,
+  messages: Message[],
+) {
+  let translationElement = message.element.querySelector(
     `.${TRANSLATION_ELEMENT_CLASS}`,
   ) as HTMLElement | null;
 
   if (translationElement) return;
 
-  const sender = getSender(messageElement);
-  const message = getContent(messageElement);
-
-  const translatedMessage = await translateMessage(sender, message);
+  const translatedMessage = await translateMessage(messages);
 
   translationElement = document.createElement("div");
 
   translationElement.className = TRANSLATION_ELEMENT_CLASS;
   translationElement.textContent = translatedMessage;
 
-  messageElement.appendChild(translationElement);
+  message.element.appendChild(translationElement);
 }

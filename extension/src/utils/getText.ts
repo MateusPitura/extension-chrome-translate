@@ -1,4 +1,4 @@
-export function getContent(messageElement: HTMLElement): string {
+export function getText(messageElement: HTMLElement): string {
   const selectableTexts = [
     ...messageElement.querySelectorAll('[data-testid="selectable-text"]'),
   ].filter(

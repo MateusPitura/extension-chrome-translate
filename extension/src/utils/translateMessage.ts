@@ -1,4 +1,12 @@
-export async function translateMessage(sender: string, message: string) {
+import { Message } from "@src/types";
+
+export async function translateMessage(
+  messages: Message[],
+): Promise<string> {
+  console.log(
+    "🌠 messages: ",
+    messages.map((message) => message.text),
+  );
   const response = await fetch(
     "https://messages-translator.mateuspitura.workers.dev/translate",
     {
@@ -10,12 +18,10 @@ export async function translateMessage(sender: string, message: string) {
         model: "@cf/openai/gpt-oss-120b",
         inputLanguage: "Spanish [Spain]",
         outputLanguage: "Portuguese [Brazil]",
-        messages: [
-          {
-            sender,
-            text: message,
-          },
-        ],
+        messages: messages.map((message) => ({
+          sender: message.sender.onlyName,
+          text: message.text,
+        })),
       }),
     },
   );

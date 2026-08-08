@@ -1,6 +1,8 @@
+import { Sender } from "@src/types";
+
 const SENDER_REGEX = /^\[[^\]]+\]\s*(.*?):\s*$/;
 
-export function getSender(messageElement: HTMLElement): string {
+export function getSender(messageElement: HTMLElement): Sender {
   const copyableText = messageElement.querySelector(
     ".copyable-text[data-pre-plain-text]",
   );
@@ -14,8 +16,11 @@ export function getSender(messageElement: HTMLElement): string {
   const match = prePlainText.match(SENDER_REGEX)?.[1];
 
   if (!match) {
-    throw new Error("Cannot get sender");
+    throw new Error("Cannot get sender"); 
   }
 
-  return match;
+  return {
+    raw: prePlainText,
+    onlyName: match,
+  }
 }
