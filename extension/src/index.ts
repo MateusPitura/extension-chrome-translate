@@ -1,3 +1,4 @@
+import { TRANSLATE_SVG } from "./constants/svgs/translate";
 import { Message } from "./types";
 import { appendTranslation } from "./utils/appendTranslation";
 import { getMessagesElement } from "./utils/getMessagesElement";
@@ -18,7 +19,7 @@ function main() {
 
     const button = document.createElement("button");
     button.className = BUTTON_ELEMENT_CLASS;
-    button.textContent = "📖";
+    button.innerHTML = TRANSLATE_SVG;
     let currentMessage: Message;
 
     try {
@@ -31,7 +32,7 @@ function main() {
       continue;
     }
 
-    button.addEventListener("click", (event) => {
+    button.addEventListener("click", async (event) => {
       event.stopPropagation();
 
       const messagesElementAux = getMessagesElement();
@@ -55,13 +56,15 @@ function main() {
           message.text === currentMessage.text,
       );
 
-      onClickTranslateMessage(
+      button.style.color = "#d1d1d1";
+      await onClickTranslateMessage(
         currentMessage,
         messagesFormatted.slice(
           Math.max(0, currentMessageIndex - 9),
           currentMessageIndex + 1,
         ),
       );
+      button.style.color = "";
     });
 
     messageElement.appendChild(button);

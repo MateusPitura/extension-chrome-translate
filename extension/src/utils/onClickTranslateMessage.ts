@@ -1,8 +1,6 @@
 import { Message } from "@src/types";
 import { appendTranslation } from "./appendTranslation";
-import {
-  saveTranslationToLocalStorage
-} from "./localStorage";
+import { saveTranslationToLocalStorage } from "./localStorage";
 import { translateMessage } from "./translateMessage";
 
 export async function onClickTranslateMessage(

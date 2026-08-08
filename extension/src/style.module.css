@@ -1,23 +1,24 @@
-:root {
-  --surface: #f6f7f8;
-  --onSurface: #011627;
-  --outlined: #808080;
-  --primary: #683d82;
-  --secondary: #fdd65d;
-}
-
 .my-reader-translation {
-  padding: 6px 8px;
   margin-top: 2px;
-  background: red;
+  padding: 6px 7px;
+  background: #0f0f0f;
   border-radius: 6px;
   font-size: 13px;
-  color: #333;
+  line-height: 1.4;
+  border: 1px solid #3561b6;
 }
 
 .my-reader-button {
   padding: 2px 2px;
   margin-top: 2px;
-  background: green;
-  border-radius: 4px;
+  color: #3561b6;
+}
+
+.my-reader-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.my-reader-button:hover {
+  color: #0841b3;
 }
