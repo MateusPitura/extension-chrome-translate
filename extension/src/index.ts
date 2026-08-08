@@ -1,23 +1,28 @@
-import { handleClickMessage } from "./utils/onClickMessage";
+import { onClickTranslateMessage } from "./utils/onClickTranslateMessage";
+
+const BUTTON_ELEMENT_CLASS = "my-reader-button";
 
 function addButtons() {
-  const messages = document.querySelectorAll('[data-testid="msg-container"]');
+  const messagesElements = document.querySelectorAll(
+    '[data-testid="msg-container"]',
+  );
 
-  for (const message of messages) {
-    if (message.querySelector(".my-reader-button")) {
+  for (const messageElement of messagesElements) {
+    if (messageElement.querySelector(`.${BUTTON_ELEMENT_CLASS}`)) {
       continue;
     }
 
     const button = document.createElement("button");
 
-    button.className = "my-reader-button";
+    button.className = BUTTON_ELEMENT_CLASS;
     button.textContent = "📖";
 
-    button.addEventListener("click", (event) =>
-      handleClickMessage(event, message as HTMLElement),
-    );
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      onClickTranslateMessage(messageElement as HTMLElement);
+    });
 
-    message.appendChild(button);
+    messageElement.appendChild(button);
   }
 }
 
