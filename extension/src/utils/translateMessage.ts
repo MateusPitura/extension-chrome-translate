@@ -13,7 +13,7 @@ export async function translateMessage(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "@cf/openai/gpt-oss-120b",
+        model: "@cf/google/gemma-4-26b-a4b-it",
         inputLanguage,
         outputLanguage,
         messages: messages.map((message) => ({
