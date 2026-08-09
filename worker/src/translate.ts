@@ -15,6 +15,8 @@ interface AIResponse {
   choices: {
     message: {
       content: string;
+      reasoning: string;
+      reasoning_content: string;
     };
   }[];
 }
@@ -61,17 +63,18 @@ ${conversation}
 
 Instructions:
 - Translate only the LAST message.
-- Use the previous messages as context.
-- Also translate messages with errors or typos
-- Preserve the original meaning and tone.
+- Return the COMPLETE translation of the LAST message. Never truncate, shorten, summarize, or omit any part of it.
+- Use the previous messages only as context to understand the LAST message.
+- Translate messages even when they contain errors, typos, or grammatical mistakes.
+- Preserve the original meaning, tone, and level of detail.
 - Keep slang and informal language natural.
 - Do not translate people's names.
-- Do not add explanations.
+- Do not add explanations, comments, or quotation marks.
 - Return only the translated text.
 `.trim();
 
   try {
-    const result = await env.AI.run(body.model, {
+    const result = (await env.AI.run(body.model, {
       messages: [
         {
           role: "system",
@@ -82,10 +85,12 @@ Instructions:
           content: prompt,
         },
       ],
-    });
+    })) as unknown as AIResponse;
+
+    console.log("result: ", JSON.stringify(result));
 
     return Response.json({
-      translation: (result as unknown as AIResponse).choices[0].message.content,
+      translation: result.choices[0].message.content,
       original: lastMessage.text,
       model: body.model,
     });
