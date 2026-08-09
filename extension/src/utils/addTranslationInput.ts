@@ -31,9 +31,9 @@ export async function addTranslationInput() {
   button.addEventListener("click", async (event) => {
     event.stopPropagation();
 
-    const text = input.value.trim();
+    const originalText = input.value.trim();
 
-    if (!text) {
+    if (!originalText) {
       return;
     }
 
@@ -52,7 +52,7 @@ export async function addTranslationInput() {
           ...lastMessages,
           {
             element: messageElement,
-            text,
+            text: originalText,
             sender: {
               raw: import.meta.env.VITE_SENDER,
               onlyName: import.meta.env.VITE_SENDER,
