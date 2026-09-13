@@ -10,7 +10,7 @@
 	},
 	"scripts": {
 		"build:extension": "tsc --noEmit && VITE_ENV=extension vite build",
-		"build:app": "tsc --noEmit && VITE_ENV=app vite build",
+		"build:app": "tsc --noEmit && VITE_ENV=app vite build && bash ./scripts/copy-dist-app.sh",
 		"dev": "nodemon & npx serve ."
 	},
 	"type": "module",

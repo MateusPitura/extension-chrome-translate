@@ -1,0 +1,77 @@
+export const STYLE = `:root {
+  --background: #0f0f0f;
+  --lightBlue: #3561b6;
+  --darkBlue: #0841b3;
+  --white: #fff;
+}
+
+.my-reader-translation {
+  margin-top: 2px;
+  padding: 6px 7px;
+  background: var(--background);
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--white);
+  border: 1px solid var(--lightBlue);
+  max-width: 320px;
+}
+
+.my-reader-button {
+  padding: 2px 2px;
+  margin-top: 2px;
+  color: var(--lightBlue);
+}
+
+.my-reader-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.my-reader-button:hover {
+  color: var(--darkBlue);
+}
+
+.my-reader-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 8px;
+}
+
+.my-reader-input {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--lightBlue);
+  border-radius: 6px;
+  outline: none;
+  font-size: 13px;
+  background: var(--background);
+  color: var(--white);
+}
+
+.my-reader-input:focus {
+  border-color: var(--darkBlue);
+}
+
+.my-reader-translate {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  background: var(--lightBlue);
+  color: var(--background);
+}
+
+.my-reader-translate:hover {
+  filter: brightness(0.9);
+}
+
+.my-reader-translate:disabled {
+  filter: brightness(0.5);
+  cursor: not-allowed;
+}
+`
