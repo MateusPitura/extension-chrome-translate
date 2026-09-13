@@ -5,6 +5,7 @@
 <p>
   <img src="https://img.shields.io/badge/Release-Aug%202026-green">
   <img src="https://img.shields.io/github/stars/MateusPitura/extension-chrome-translate?style=social">
+  <img src="https://img.shields.io/badge/OS-Android-red">  
 </p>
 
 ## Description
