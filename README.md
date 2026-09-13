@@ -32,7 +32,7 @@ Translate WhatsApp Web messages directly in your browser without leaving the con
 
 2. Run `npm run dev` to serve the extension assets locally
 
-3. Build the project with `npm run build`
+3. Build the project with `npm run build:extension`
 
 4. Open the Extensions tab in Chrome, enable `Developer mode`, and load the generated `dist/` folder as an unpacked extension
 

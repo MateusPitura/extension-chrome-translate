@@ -4,7 +4,7 @@ import { createHash } from "./createHash";
 const LOCAL_STORAGE_KEY = "translations";
 
 async function createMessageHash(message: Message): Promise<string> {
-  return await createHash(`${message.sender.raw}#${message.text}`);
+  return await createHash(message.sender.raw + '#' + message.text);
 }
 
 export async function saveTranslationToLocalStorage(

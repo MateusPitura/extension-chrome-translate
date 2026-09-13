@@ -4,7 +4,7 @@ const TRANSLATION_ELEMENT_CLASS = "my-reader-translation";
 
 export function appendTranslation(message: Message, translatedMessage: string) {
   let translationElement = message.element.querySelector(
-    `.${TRANSLATION_ELEMENT_CLASS}`,
+    '.' + TRANSLATION_ELEMENT_CLASS,
   ) as HTMLElement | null;
 
   if (translationElement) {

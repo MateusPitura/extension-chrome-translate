@@ -15,7 +15,7 @@ function main() {
   const messagesElement = getMessagesElement();
 
   for (const messageElement of messagesElement) {
-    if (messageElement.querySelector(`.${BUTTON_ELEMENT_CLASS}`)) {
+    if (messageElement.querySelector("." + BUTTON_ELEMENT_CLASS)) {
       continue;
     }
 

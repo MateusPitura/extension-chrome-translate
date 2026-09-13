@@ -12,7 +12,7 @@ export async function addTranslationInput() {
 
   if (
     !messageElement ||
-    messageElement.querySelector(`.${INPUT_CONTAINER_ELEMENT_CLASS}`)
+    messageElement.querySelector("." + INPUT_CONTAINER_ELEMENT_CLASS)
   ) {
     return;
   }

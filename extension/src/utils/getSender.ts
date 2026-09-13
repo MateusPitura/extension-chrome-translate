@@ -1,7 +1,5 @@
 import { Sender } from "@src/types";
 
-const SENDER_REGEX = /^\[[^\]]+\]\s*(.*?):\s*$/;
-
 export function getSender(messageElement: HTMLElement): Sender {
   const copyableText = messageElement.querySelector(
     ".copyable-text[data-pre-plain-text]",
@@ -10,17 +8,28 @@ export function getSender(messageElement: HTMLElement): Sender {
   const prePlainText = copyableText?.getAttribute("data-pre-plain-text");
 
   if (!prePlainText) {
-    throw new Error("Cannot get sender");
+    throw new Error("Cannot get sender, no text");
   }
 
-  const match = prePlainText.match(SENDER_REGEX)?.[1];
+  const closeBracketIndex = prePlainText.indexOf("]");
+  const lastColonIndex = prePlainText.lastIndexOf(":");
 
-  if (!match) {
-    throw new Error("Cannot get sender"); 
+  if (
+    closeBracketIndex === -1 ||
+    lastColonIndex === -1 ||
+    lastColonIndex <= closeBracketIndex
+  ) {
+    throw new Error("Cannot get sender, unexpected format: " + prePlainText);
+  }
+
+  const name = prePlainText.slice(closeBracketIndex + 1, lastColonIndex).trim();
+
+  if (!name) {
+    throw new Error("Cannot get sender, empty name: " + prePlainText);
   }
 
   return {
     raw: prePlainText,
-    onlyName: match,
-  }
+    onlyName: name,
+  };
 }
