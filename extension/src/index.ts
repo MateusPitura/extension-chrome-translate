@@ -46,14 +46,17 @@ function main() {
       );
 
       button.style.color = "#d1d1d1";
-      await onClickTranslateMessage(
-        currentMessage,
-        messagesFormatted.slice(
-          Math.max(0, currentMessageIndex - 9),
-          currentMessageIndex + 1,
-        ),
-      );
-      button.style.color = "";
+      try {
+        await onClickTranslateMessage(
+          currentMessage,
+          messagesFormatted.slice(
+            Math.max(0, currentMessageIndex - 9),
+            currentMessageIndex + 1,
+          ),
+        );
+      } finally {
+        button.style.color = "";
+      }
     });
 
     messageElement.appendChild(button);

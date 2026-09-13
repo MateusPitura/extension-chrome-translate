@@ -46,7 +46,7 @@ export function bridgeFetch<T = any>(
   options: BridgeFetchOptions = {},
 ): Promise<T> {
   const id = generateId();
-  const { timeoutMs = 15000, ...rest } = options;
+  const { timeoutMs = 15_000, ...rest } = options;
   const pendingRequests = getPendingRequests();
 
   return new Promise<T>((resolve, reject) => {
