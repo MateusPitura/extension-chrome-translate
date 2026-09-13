@@ -9,7 +9,7 @@
 
 ## Description
 
-Translate WhatsApp Web messages directly in your browser without leaving the conversation. This Chrome extension adds a translation button to each message and a composer shortcut to translate custom text using a backend translation service
+Translate WhatsApp Web messages directly in your browser without leaving the conversation. This Chrome extension adds a translation button to each message and a composer shortcut to translate custom text using a backend translation service. There is also a React Native app that allows you to translate messages on your Android device
 
 - [Features](#features)
 - [How to Run](#how-to-run)
@@ -22,11 +22,13 @@ Translate WhatsApp Web messages directly in your browser without leaving the con
 
 📝 **Composer translation:** translation input in the message composer
 
-💾 **Local caching:** translated messages are stored in local storage
+📱 **Android App:** a web view that loads WhatsApp Web with the extension injected
 
 ## How to Run
 
 **For devs:**
+
+### Chrome Extension
 
 1. Navigate to the `extension/` folder and install dependencies with `npm i`
 
@@ -36,13 +38,25 @@ Translate WhatsApp Web messages directly in your browser without leaving the con
 
 4. Open the Extensions tab in Chrome, enable `Developer mode`, and load the generated `dist/` folder as an unpacked extension
 
+### React Native App
+
+1. Navigate to the `app/` folder and install dependencies with `npm i`
+
+2. Run `npm run start` to start the Expo development server
+
+3. Use the Expo Go app on your Android device to scan the QR code and run the app
+
+4. To build the Android app, run `npm run build:android`
+
 ## Technologies Used
 
 <!--Link for badges: https://github.com/Ileriayo/markdown-badges -->
 
 <p align="left">
 	<img src="https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white" alt="Typescript"/>
-    <img src="https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white" alt="Cloudflare"/>
+  <img src="https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white" alt="Cloudflare"/>
+  <img src="https://img.shields.io/badge/react_native-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB" alt="ReactNative"/>
+  <img src="https://img.shields.io/badge/expo-%231C1E24.svg?style=for-the-badge&logo=expo&logoColor=#D04A37" alt="Expo"/>
 </p>
 
 ## Authors
