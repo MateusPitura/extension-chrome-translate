@@ -4,3 +4,4 @@ extension/public/contentStyle.module.css
 extension/public/manifest.json
 dist.zip
 .env
+.expo/
