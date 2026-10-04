@@ -10,7 +10,7 @@
 
 ## Description
 
-Translate WhatsApp Web messages directly in your browser without leaving the conversation. This Chrome extension adds a translation button to each message and a composer shortcut to translate custom text using a backend translation service. There is also a React Native app that allows you to translate messages on your Android device
+Translate WhatsApp Web messages directly in your browser without leaving the conversation. This Chrome extension adds a translation button to each message and a composer shortcut to translate custom text using a backend translation service. There is also a React Native app that scans the clipboard for WhatsApp messages that have been copied and displays them in a chat interface with translation options.
 
 - [Features](#features)
 - [How to Run](#how-to-run)
@@ -23,7 +23,7 @@ Translate WhatsApp Web messages directly in your browser without leaving the con
 
 📝 **Composer translation:** translation input in the message composer
 
-📱 **Android App:** a web view that loads WhatsApp Web with the extension injected
+📱 **Android App:** read the clipboard to find the WhatsApp messages that have been copied and display them in the chat interface with translation options
 
 ## How to Run
 
