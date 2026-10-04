@@ -8,12 +8,18 @@
     "userInterfaceStyle": "dark",
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#12161C",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.mateuspitura.chattranslator"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7e072dec-e2b2-4fe7-a6d1-1ae5081d3037"
+      }
     }
   }
 }
