@@ -1,18 +1,18 @@
 import { StatusBar } from "expo-status-bar";
 import { useMemo } from "react";
 import {
-    FlatList,
-    KeyboardAvoidingView,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  FlatList,
+  KeyboardAvoidingView,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
-    CHAT_LANGUAGE,
-    MAIN_MEMBER_NAME,
-    MY_LANGUAGE,
+  CHAT_LANGUAGE,
+  MAIN_MEMBER_NAME,
+  MY_LANGUAGE,
 } from "../constants/config";
 import { colors } from "../constants/theme";
 import { useChat } from "../hooks/useChat";
@@ -31,6 +31,7 @@ export default function Chat() {
     ready,
     importAndNotify,
     translateReceived,
+    deleteReceived,
     translateDraft,
   } = useChat();
 
@@ -91,6 +92,7 @@ export default function Chat() {
                   loading={!!pending[item.id]}
                   dayLabel={newDay ? formatDay(item.timestamp) : undefined}
                   onTranslate={translateReceived}
+                  onDelete={deleteReceived}
                 />
               );
             }}

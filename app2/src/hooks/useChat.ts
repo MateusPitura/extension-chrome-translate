@@ -99,17 +99,29 @@ export function useChat() {
     await saveTranslations(next);
   }, []);
 
+  const removeTranslation = useCallback(async (key: string) => {
+    const next = translationsRef.current;
+    delete next[key];
+    translationsRef.current = next;
+    setTranslations(next);
+    await saveTranslations(next);
+  }, []);
+
   /** Chat language -> my language, for one received message (with the previous ones as context). */
   const translateReceived = useCallback(
     async (id: string) => {
-      const list = messagesRef.current;
-      const index = list.findIndex((m) => m.id === id);
+      const messagesList = messagesRef.current;
+      const index = messagesList.findIndex((message) => message.id === id);
+      if (index < 0) return;
+
       const key = translationKey(`msg:${id}`, CHAT_LANGUAGE, MY_LANGUAGE);
-      if (index < 0 || translationsRef.current[key]) return;
+      if (translationsRef.current[key]) {
+        await removeTranslation(key);
+      }
 
       setPending((p) => ({ ...p, [id]: true }));
       try {
-        const context = list.slice(
+        const context = messagesList.slice(
           Math.max(0, index - CONTEXT_SIZE + 1),
           index + 1,
         );
@@ -125,7 +137,26 @@ export function useChat() {
         setPending((p) => ({ ...p, [id]: false }));
       }
     },
-    [cacheTranslation],
+    [cacheTranslation, removeTranslation],
+  );
+
+  const deleteReceived = useCallback(
+    async (id: string) => {
+      const messagesList = messagesRef.current;
+      const index = messagesList.findIndex((message) => message.id === id);
+      if (index < 0) return;
+
+      const key = translationKey(`msg:${id}`, CHAT_LANGUAGE, MY_LANGUAGE);
+      if (translationsRef.current[key]) {
+        await removeTranslation(key);
+      }
+
+      const next = messagesList.filter((message) => message.id !== id);
+      messagesRef.current = next; // update synchronously so concurrent imports see it
+      setMessages(next);
+      await saveMessages(next);
+    },
+    [removeTranslation],
   );
 
   /** My language -> chat language, for a draft. Throws on failure. */
@@ -136,8 +167,6 @@ export function useChat() {
         MY_LANGUAGE,
         CHAT_LANGUAGE,
       );
-      const cached = translationsRef.current[key];
-      if (cached) return cached;
 
       const draft: Message = {
         id: "draft",
@@ -167,6 +196,7 @@ export function useChat() {
     ready,
     importAndNotify,
     translateReceived,
+    deleteReceived,
     translateDraft,
   };
 }

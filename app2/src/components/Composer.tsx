@@ -26,8 +26,11 @@ export function Composer({ onTranslate, bottomInset }: Props) {
   async function translate() {
     if (!canTranslate) return;
     setLoading(true);
+    setResult(null);
     try {
-      setResult(await onTranslate(draft.trim()));
+      const newResult = await onTranslate(draft.trim())
+      setResult(newResult);
+      copy(newResult);
     } catch (error) {
       ToastAndroid.show(
         error instanceof Error ? error.message : "Translation failed",
@@ -38,9 +41,9 @@ export function Composer({ onTranslate, bottomInset }: Props) {
     }
   }
 
-  async function copy() {
-    if (!result) return;
-    await Clipboard.setStringAsync(result);
+  async function copy(text?: string) {
+    if (!text) return;
+    await Clipboard.setStringAsync(text);
     ToastAndroid.show("Copied", ToastAndroid.SHORT);
   }
 
@@ -57,7 +60,7 @@ export function Composer({ onTranslate, bottomInset }: Props) {
             {result}
           </Text>
           <View style={styles.actions}>
-            <Pressable onPress={copy} hitSlop={8}>
+            <Pressable onPress={() => copy(result)} hitSlop={8}>
               <Text style={styles.action}>Copy</Text>
             </Pressable>
             <Pressable onPress={clear} hitSlop={8}>

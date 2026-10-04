@@ -16,6 +16,7 @@ interface Props {
   loading: boolean;
   dayLabel?: string;
   onTranslate: (id: string) => void;
+  onDelete: (id: string) => void;
 }
 
 export default function MessageBubble({
@@ -25,6 +26,7 @@ export default function MessageBubble({
   loading,
   dayLabel,
   onTranslate,
+  onDelete
 }: Props) {
   return (
     <View>
@@ -50,14 +52,16 @@ export default function MessageBubble({
         ) : null}
 
         <View style={styles.footer}>
-          {!translation &&
-            (loading ? (
-              <ActivityIndicator size="small" color={colors.translation} />
-            ) : (
-              <Pressable onPress={() => onTranslate(message.id)} hitSlop={10}>
-                <Text style={styles.translateButton}>Translate</Text>
-              </Pressable>
-            ))}
+          <Pressable onPress={() => onDelete(message.id)} hitSlop={10}>
+            <Text style={styles.deleteButton}>Delete</Text>
+          </Pressable>
+          {loading ? (
+            <ActivityIndicator size="small" color={colors.translation} />
+          ) : (
+            <Pressable onPress={() => onTranslate(message.id)} hitSlop={10}>
+              <Text style={styles.translateButton}>Translate</Text>
+            </Pressable>
+          )}
           <Text style={styles.time}>{formatTime(message.timestamp)}</Text>
         </View>
       </View>
@@ -119,10 +123,15 @@ const styles = StyleSheet.create({
     gap: 14,
     marginTop: 4,
   },
-  translateButton: {
-    color: colors.translation,
-    fontSize: 13,
+  deleteButton: {
+    color: colors.danger,
+    fontSize: 12,
     fontWeight: "600",
   },
-  time: { color: colors.muted, fontSize: 11 },
+  translateButton: {
+    color: colors.translation,
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  time: { color: colors.muted, fontSize: 12 },
 });

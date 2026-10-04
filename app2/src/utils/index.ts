@@ -52,7 +52,7 @@ export function formatTime(ts: number) {
 export function formatDay(ts: number) {
   const date = new Date(ts);
   const sameYear = date.getFullYear() === new Date().getFullYear();
-  return date.toLocaleDateString("pt-BR", {
+  return date.toLocaleDateString("en-US", {
     day: "numeric",
     month: "long",
     ...(sameYear ? {} : { year: "numeric" }),
