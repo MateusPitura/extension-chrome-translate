@@ -1,5 +1,5 @@
-import { TRANSLATE_MODEL, TRANSLATE_URL } from "./config";
-import type { Language, Message } from "./types";
+import { TRANSLATE_MODEL, TRANSLATE_URL } from "../constants/config";
+import type { Language, Message } from "../types";
 
 /**
  * Translates the LAST message of `messages`; the previous ones are sent as conversation context.

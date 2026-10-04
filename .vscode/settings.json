@@ -1,0 +1,3 @@
+{
+  "selectiveAutoSave.exclude": ["app2/**/*"]
+}

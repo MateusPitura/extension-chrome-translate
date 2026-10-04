@@ -3,14 +3,13 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
-  Share,
   StyleSheet,
   Text,
   TextInput,
   ToastAndroid,
   View,
 } from "react-native";
-import { colors } from "../theme";
+import { colors } from "../constants/theme";
 
 interface Props {
   onTranslate: (text: string) => Promise<string>;
@@ -24,32 +23,31 @@ export function Composer({ onTranslate, bottomInset }: Props) {
 
   const canTranslate = draft.trim().length > 0 && !loading;
 
-  // Translation only runs when the button is pressed, never while typing.
-  const translate = async () => {
+  async function translate() {
     if (!canTranslate) return;
     setLoading(true);
     try {
       setResult(await onTranslate(draft.trim()));
-    } catch (e) {
+    } catch (error) {
       ToastAndroid.show(
-        e instanceof Error ? e.message : "Translation failed",
+        error instanceof Error ? error.message : "Translation failed",
         ToastAndroid.LONG,
       );
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const copy = async () => {
+  async function copy() {
     if (!result) return;
     await Clipboard.setStringAsync(result);
     ToastAndroid.show("Copied", ToastAndroid.SHORT);
-  };
+  }
 
-  const clear = () => {
+  function clear() {
     setDraft("");
     setResult(null);
-  };
+  }
 
   return (
     <View style={[styles.container, { paddingBottom: 10 + bottomInset }]}>
@@ -61,9 +59,6 @@ export function Composer({ onTranslate, bottomInset }: Props) {
           <View style={styles.actions}>
             <Pressable onPress={copy} hitSlop={8}>
               <Text style={styles.action}>Copy</Text>
-            </Pressable>
-            <Pressable onPress={() => Share.share({ message: result })} hitSlop={8}>
-              <Text style={styles.action}>Share</Text>
             </Pressable>
             <Pressable onPress={clear} hitSlop={8}>
               <Text style={styles.actionMuted}>Clear</Text>
@@ -80,7 +75,7 @@ export function Composer({ onTranslate, bottomInset }: Props) {
             setDraft(text);
             setResult(null);
           }}
-          placeholder="Write in Portuguese"
+          placeholder="Write"
           placeholderTextColor={colors.muted}
           multiline
         />

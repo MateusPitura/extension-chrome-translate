@@ -5,7 +5,6 @@ export const colors = {
   mine: "#33408C",
   text: "#EEF1F6",
   muted: "#8B96A7",
-  /** Marks everything that is a translation. */
   translation: "#F2C14E",
   translationText: "#F7E7BC",
   danger: "#E5736A",

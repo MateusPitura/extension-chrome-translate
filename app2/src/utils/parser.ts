@@ -1,13 +1,14 @@
-import type { Message } from "./types";
-import { hash } from "./utils";
+import { hash } from ".";
+import type { Message } from "../types";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 // "[10/2, 15:32] John Doe: text" -> [Month/Day, HH:MM] (year and seconds optional)
-const HEADER =
+const HEADER_REGEX =
   /^\[(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?,\s*(\d{1,2}):(\d{2})(?::(\d{2}))?\]\s*([^:\n]+?):\s?(.*)$/;
+
 // Any line that starts like a WhatsApp stamp (e.g. system messages without "Name:")
-const STAMP = /^\[\d{1,2}\/\d{1,2}(?:\/\d{2,4})?,\s*\d{1,2}:\d{2}/;
+const STAMP_REGEX = /^\[\d{1,2}\/\d{1,2}(?:\/\d{2,4})?,\s*\d{1,2}:\d{2}/;
 
 interface Draft {
   timestamp: number;
@@ -24,10 +25,18 @@ function toTimestamp(
   second: number,
   now: Date,
 ): number | null {
-  if (month < 1 || month > 12 || day < 1 || day > 31 || hour > 23 || minute > 59) {
+  if (
+    month < 1 ||
+    month > 12 ||
+    day < 1 ||
+    day > 31 ||
+    hour > 23 ||
+    minute > 59
+  ) {
     return null;
   }
-  const fullYear = year === undefined ? now.getFullYear() : year < 100 ? 2000 + year : year;
+  const fullYear =
+    year === undefined ? now.getFullYear() : year < 100 ? 2000 + year : year;
   let date = new Date(fullYear, month - 1, day, hour, minute, second);
   // No year in the stamp and the date lands in the future: it belongs to last year.
   if (year === undefined && date.getTime() > now.getTime() + DAY_MS) {
@@ -47,10 +56,11 @@ export function parseWhatsAppChat(raw: string, now = new Date()): Message[] {
   for (const rawLine of raw.split(/\r?\n/)) {
     // WhatsApp inserts invisible direction marks (LRM/RLM) in copied text
     const line = rawLine.replace(/[\u200e\u200f]/g, "");
-    const match = HEADER.exec(line);
+    const match = HEADER_REGEX.exec(line);
 
     if (!match) {
-      if (STAMP.test(line)) current = null; // stamped line without sender: system message
+      if (STAMP_REGEX.test(line))
+        current = null; // stamped line without sender: system message
       else if (current) current.lines.push(line);
       continue;
     }

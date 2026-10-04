@@ -1,27 +1,23 @@
 import * as Clipboard from "expo-clipboard";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AppState, ToastAndroid } from "react-native";
+import { AppState } from "react-native";
 import {
   CHAT_LANGUAGE,
   CLIPBOARD_DELAY_MS,
   CONTEXT_SIZE,
   MAIN_MEMBER_NAME,
   MY_LANGUAGE,
-} from "./config";
-import { parseWhatsAppChat } from "./parser";
+} from "../constants/config";
+import type { Message } from "../types";
+import { getErrorText, hash, showToast, translationKey } from "../utils";
+import { parseWhatsAppChat } from "../utils/parser";
 import {
   loadMessages,
   loadTranslations,
   saveMessages,
   saveTranslations,
-} from "./storage";
-import { translateMessage } from "./translate";
-import type { Message } from "./types";
-import { hash, translationKey } from "./utils";
-
-const toast = (text: string) => ToastAndroid.show(text, ToastAndroid.SHORT);
-const errorText = (e: unknown) =>
-  e instanceof Error ? e.message : "Something went wrong";
+} from "../utils/storage";
+import { translateMessage } from "../utils/translate";
 
 export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -71,9 +67,10 @@ export function useChat() {
   const importAndNotify = useCallback(async () => {
     try {
       const added = await importFromClipboard();
-      if (added > 0) toast(`${added} new message${added > 1 ? "s" : ""} added`);
+      if (added > 0)
+        showToast(`${added} new message${added > 1 ? "s" : ""} added`);
     } catch (e) {
-      toast(errorText(e));
+      showToast(getErrorText(e));
     }
   }, [importFromClipboard]);
 
@@ -112,11 +109,18 @@ export function useChat() {
 
       setPending((p) => ({ ...p, [id]: true }));
       try {
-        const context = list.slice(Math.max(0, index - CONTEXT_SIZE + 1), index + 1);
-        const result = await translateMessage(context, CHAT_LANGUAGE, MY_LANGUAGE);
+        const context = list.slice(
+          Math.max(0, index - CONTEXT_SIZE + 1),
+          index + 1,
+        );
+        const result = await translateMessage(
+          context,
+          CHAT_LANGUAGE,
+          MY_LANGUAGE,
+        );
         await cacheTranslation(key, result);
       } catch (e) {
-        toast(errorText(e));
+        showToast(getErrorText(e));
       } finally {
         setPending((p) => ({ ...p, [id]: false }));
       }
@@ -127,7 +131,11 @@ export function useChat() {
   /** My language -> chat language, for a draft. Throws on failure. */
   const translateDraft = useCallback(
     async (text: string): Promise<string> => {
-      const key = translationKey(`draft:${hash(text)}`, MY_LANGUAGE, CHAT_LANGUAGE);
+      const key = translationKey(
+        `draft:${hash(text)}`,
+        MY_LANGUAGE,
+        CHAT_LANGUAGE,
+      );
       const cached = translationsRef.current[key];
       if (cached) return cached;
 
@@ -137,8 +145,15 @@ export function useChat() {
         sender: { onlyName: MAIN_MEMBER_NAME },
         text,
       };
-      const context = [...messagesRef.current.slice(-(CONTEXT_SIZE - 1)), draft];
-      const result = await translateMessage(context, MY_LANGUAGE, CHAT_LANGUAGE);
+      const context = [
+        ...messagesRef.current.slice(-(CONTEXT_SIZE - 1)),
+        draft,
+      ];
+      const result = await translateMessage(
+        context,
+        MY_LANGUAGE,
+        CHAT_LANGUAGE,
+      );
       await cacheTranslation(key, result);
       return result;
     },
