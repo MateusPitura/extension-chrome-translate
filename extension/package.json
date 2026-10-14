@@ -9,8 +9,7 @@
 		"url": ""
 	},
 	"scripts": {
-		"build:extension": "tsc --noEmit && VITE_ENV=extension vite build",
-		"build:app": "tsc --noEmit && VITE_ENV=app vite build",
+		"build": "tsc --noEmit && vite build",
 		"dev": "nodemon & npx serve ."
 	},
 	"type": "module",

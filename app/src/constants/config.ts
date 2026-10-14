@@ -1,9 +1,13 @@
 import type { Language } from "../types";
 
 export const MAIN_MEMBER_NAME = process.env.EXPO_PUBLIC_MAIN_MEMBER_NAME ?? "";
+export const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY ?? "";
 
-export const TRANSLATE_URL =
+export const WORKER_URL =
   "https://messages-translator.mateuspitura.workers.dev/translate";
+
+export const GEMINI_API_URL =
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent";
 
 export const TRANSLATE_MODEL = "@cf/google/gemma-4-26b-a4b-it";
 
