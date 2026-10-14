@@ -1,17 +1,13 @@
-import {
-  GEMINI_API_KEY,
-  GEMINI_API_URL,
-  TRANSLATE_MODEL,
-  WORKER_URL,
-} from "../constants/config";
-import { Language, Message } from "../types";
+import { WORKER_URL } from "../constants/config";
+import type { AIModel, Language, Message, TranslationProvider } from "../types";
 
-export type TranslationProvider = "gemini" | "worker";
+export type { TranslationProvider };
 
 async function translateWithWorker(
   messages: Message[],
   inputLanguage: Language,
   outputLanguage: Language,
+  modelName: string,
 ): Promise<string> {
   const payload = {
     method: "POST",
@@ -19,7 +15,7 @@ async function translateWithWorker(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: TRANSLATE_MODEL,
+      model: modelName,
       inputLanguage,
       outputLanguage,
       messages: messages.map((message) => ({
@@ -29,7 +25,6 @@ async function translateWithWorker(
     }),
   };
 
-  let responseJson;
   const response = await fetch(WORKER_URL, payload);
   if (!response.ok) {
     const errorText = await response.text();
@@ -37,7 +32,7 @@ async function translateWithWorker(
       `Worker translation error (${response.status}): ${errorText}`,
     );
   }
-  responseJson = await response.json();
+  const responseJson = await response.json();
 
   return responseJson.translation;
 }
@@ -46,9 +41,11 @@ async function translateWithGemini(
   messages: Message[],
   inputLanguage: Language,
   outputLanguage: Language,
+  modelName: string,
+  apiKey: string,
 ): Promise<string> {
-  if (!GEMINI_API_KEY) {
-    throw new Error("VITE_GEMINI_API_KEY is not set");
+  if (!apiKey) {
+    throw new Error("Gemini API key is not set. Please insert it in Settings.");
   }
 
   const conversation = messages
@@ -76,11 +73,13 @@ Instructions:
 - Return only the translated text.
 `.trim();
 
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
+
   const payload = {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-goog-api-key": GEMINI_API_KEY,
+      "x-goog-api-key": apiKey,
     },
     body: JSON.stringify({
       contents: [
@@ -95,13 +94,12 @@ Instructions:
     }),
   };
 
-  let responseJson;
-  const response = await fetch(GEMINI_API_URL, payload);
+  const response = await fetch(url, payload);
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(`Gemini API error (${response.status}): ${errorText}`);
   }
-  responseJson = await response.json();
+  const responseJson = await response.json();
 
   const candidateText =
     responseJson?.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -117,15 +115,25 @@ export async function translateMessage(
   messages: Message[],
   inputLanguage: Language,
   outputLanguage: Language,
-  provider: TranslationProvider = "gemini",
+  model: AIModel,
+  apiKey: string,
 ): Promise<string> {
-  switch (provider) {
-    case "gemini":
-      return translateWithGemini(messages, inputLanguage, outputLanguage);
-    case "worker":
-      return translateWithWorker(messages, inputLanguage, outputLanguage);
-    default: {
-      throw new Error(`Unsupported translation provider: ${provider}`);
-    }
+  if (model.provider === "gemini") {
+    return translateWithGemini(
+      messages,
+      inputLanguage,
+      outputLanguage,
+      model.name,
+      apiKey,
+    );
+  } else if (model.provider === "worker") {
+    return translateWithWorker(
+      messages,
+      inputLanguage,
+      outputLanguage,
+      model.name,
+    );
   }
+
+  throw new Error("Unsupported translation provider");
 }

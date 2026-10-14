@@ -5,16 +5,23 @@ import {
   CHAT_LANGUAGE,
   CLIPBOARD_DELAY_MS,
   CONTEXT_SIZE,
+  DEFAULT_MODELS,
   MAIN_MEMBER_NAME,
   MY_LANGUAGE,
 } from "../constants/config";
-import type { Message } from "../types";
+import type { AIModel, Message } from "../types";
 import { getErrorText, hash, showToast, translationKey } from "../utils";
 import { parseWhatsAppChat } from "../utils/parser";
 import {
+  loadApiKey,
   loadMessages,
+  loadModels,
+  loadSelectedModel,
   loadTranslations,
+  saveApiKey,
   saveMessages,
+  saveModels,
+  saveSelectedModel,
   saveTranslations,
 } from "../utils/storage";
 import { translateMessage } from "../utils/translate";
@@ -24,22 +31,50 @@ export function useChat() {
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [pending, setPending] = useState<Record<string, boolean>>({});
   const [ready, setReady] = useState(false);
+  const [apiKey, setApiKey] = useState("");
+  const [models, setModels] = useState<AIModel[]>(DEFAULT_MODELS);
+  const [selectedModel, setSelectedModel] = useState<AIModel>(DEFAULT_MODELS[0]);
 
   // Refs hold the latest values for async callbacks and the AppState listener.
   const messagesRef = useRef<Message[]>([]);
   const translationsRef = useRef<Record<string, string>>({});
+  const apiKeyRef = useRef<string>("");
+  const modelsRef = useRef<AIModel[]>(DEFAULT_MODELS);
+  const selectedModelRef = useRef<AIModel>(DEFAULT_MODELS[0]);
 
-  // 1. Load saved history and cached translations.
+  // 1. Load saved history, cached translations, apiKey, and models.
   useEffect(() => {
     (async () => {
-      const [savedMessages, savedTranslations] = await Promise.all([
+      const [
+        savedMessages,
+        savedTranslations,
+        savedApiKey,
+        savedModels,
+        savedSelectedModel,
+      ] = await Promise.all([
         loadMessages(),
         loadTranslations(),
+        loadApiKey(),
+        loadModels(),
+        loadSelectedModel(),
       ]);
       messagesRef.current = savedMessages;
       translationsRef.current = savedTranslations;
+      apiKeyRef.current = savedApiKey;
+      modelsRef.current = savedModels;
+
+      const activeModel =
+        savedModels.find((m) => m.name === savedSelectedModel.name) ??
+        savedModels[0] ??
+        DEFAULT_MODELS[0];
+
+      selectedModelRef.current = activeModel;
+
       setMessages(savedMessages);
       setTranslations(savedTranslations);
+      setApiKey(savedApiKey);
+      setModels(savedModels);
+      setSelectedModel(activeModel);
       setReady(true);
     })();
   }, []);
@@ -129,6 +164,8 @@ export function useChat() {
           context,
           CHAT_LANGUAGE,
           MY_LANGUAGE,
+          selectedModelRef.current,
+          apiKeyRef.current,
         );
         await cacheTranslation(key, result);
       } catch (e) {
@@ -182,6 +219,8 @@ export function useChat() {
         context,
         MY_LANGUAGE,
         CHAT_LANGUAGE,
+        selectedModelRef.current,
+        apiKeyRef.current,
       );
       await cacheTranslation(key, result);
       return result;
@@ -189,11 +228,101 @@ export function useChat() {
     [cacheTranslation],
   );
 
+  const updateApiKey = useCallback(async (key: string) => {
+    apiKeyRef.current = key;
+    setApiKey(key);
+    await saveApiKey(key);
+  }, []);
+
+  const selectModel = useCallback(async (model: AIModel) => {
+    selectedModelRef.current = model;
+    setSelectedModel(model);
+    await saveSelectedModel(model);
+  }, []);
+
+  const addModel = useCallback(async (newModel: AIModel): Promise<boolean> => {
+    const trimmedName = newModel.name.trim();
+    if (!trimmedName) {
+      showToast("Model name cannot be empty");
+      return false;
+    }
+    if (modelsRef.current.some((m) => m.name === trimmedName)) {
+      showToast("A model with this name already exists");
+      return false;
+    }
+    const item: AIModel = { name: trimmedName, provider: newModel.provider };
+    const next = [...modelsRef.current, item];
+    modelsRef.current = next;
+    setModels(next);
+    await saveModels(next);
+    return true;
+  }, []);
+
+  const updateModel = useCallback(
+    async (index: number, updated: AIModel): Promise<boolean> => {
+      const trimmedName = updated.name.trim();
+      if (!trimmedName) {
+        showToast("Model name cannot be empty");
+        return false;
+      }
+      const currentList = modelsRef.current;
+      const oldModel = currentList[index];
+      if (
+        currentList.some((m, i) => i !== index && m.name === trimmedName)
+      ) {
+        showToast("A model with this name already exists");
+        return false;
+      }
+      const item: AIModel = { name: trimmedName, provider: updated.provider };
+      const next = [...currentList];
+      next[index] = item;
+      modelsRef.current = next;
+      setModels(next);
+      await saveModels(next);
+
+      if (selectedModelRef.current.name === oldModel.name) {
+        selectedModelRef.current = item;
+        setSelectedModel(item);
+        await saveSelectedModel(item);
+      }
+      return true;
+    },
+    [],
+  );
+
+  const deleteModel = useCallback(async (index: number) => {
+    const currentList = modelsRef.current;
+    if (currentList.length <= 1) {
+      showToast("Cannot delete the only model");
+      return;
+    }
+    const modelToDelete = currentList[index];
+    const next = currentList.filter((_, i) => i !== index);
+    modelsRef.current = next;
+    setModels(next);
+    await saveModels(next);
+
+    if (selectedModelRef.current.name === modelToDelete.name) {
+      const fallback = next[0];
+      selectedModelRef.current = fallback;
+      setSelectedModel(fallback);
+      await saveSelectedModel(fallback);
+    }
+  }, []);
+
   return {
     messages,
     translations,
     pending,
     ready,
+    apiKey,
+    models,
+    selectedModel,
+    updateApiKey,
+    selectModel,
+    addModel,
+    updateModel,
+    deleteModel,
     importAndNotify,
     translateReceived,
     deleteReceived,

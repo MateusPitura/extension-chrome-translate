@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -20,16 +20,25 @@ import { dayKey, formatDay, isMine, translationKey } from "../utils";
 import { Composer } from "./Composer";
 import Empty from "./Empty";
 import MessageBubble from "./MessageBubble";
+import SettingsModal from "./SettingsModal";
 
 export default function Chat() {
   const insets = useSafeAreaInsets();
+  const [settingsVisible, setSettingsVisible] = useState(false);
 
   const {
     messages,
     translations,
     pending,
     ready,
-    importAndNotify,
+    apiKey,
+    models,
+    selectedModel,
+    updateApiKey,
+    selectModel,
+    addModel,
+    updateModel,
+    deleteModel,
     translateReceived,
     deleteReceived,
     translateDraft,
@@ -49,14 +58,27 @@ export default function Chat() {
           <Text style={styles.title}>{otherName ?? "Chat"}</Text>
           <Text style={[styles.subtitle, !MAIN_MEMBER_NAME && styles.warning]}>
             {MAIN_MEMBER_NAME
-              ? `${messages.length} messages`
+              ? `${messages.length} messages • ${selectedModel.name}`
               : "Set EXPO_PUBLIC_MAIN_MEMBER_NAME in .env"}
           </Text>
         </View>
-        <Pressable onPress={importAndNotify} hitSlop={10}>
-          <Text style={styles.refresh}>Paste</Text>
+        <Pressable onPress={() => setSettingsVisible(true)} hitSlop={10}>
+          <Text style={styles.settingsButton}>Settings</Text>
         </Pressable>
       </View>
+
+      <SettingsModal
+        visible={settingsVisible}
+        onClose={() => setSettingsVisible(false)}
+        apiKey={apiKey}
+        onUpdateApiKey={updateApiKey}
+        models={models}
+        selectedModel={selectedModel}
+        onSelectModel={selectModel}
+        onAddModel={addModel}
+        onUpdateModel={updateModel}
+        onDeleteModel={deleteModel}
+      />
 
       <KeyboardAvoidingView style={styles.flex} behavior="padding">
         {ready && messages.length === 0 ? (
@@ -120,6 +142,10 @@ const styles = StyleSheet.create({
   title: { color: colors.text, fontSize: 18, fontWeight: "700" },
   subtitle: { color: colors.muted, fontSize: 12, marginTop: 2 },
   warning: { color: colors.danger },
-  refresh: { color: colors.translation, fontSize: 13, fontWeight: "600" },
+  settingsButton: {
+    color: colors.translation,
+    fontSize: 13,
+    fontWeight: "600",
+  },
   list: { paddingHorizontal: 10, paddingVertical: 8 },
 });
