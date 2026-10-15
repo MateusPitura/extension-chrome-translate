@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WhatsApp Translate - Models</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <div class="popup-container">
+      <header class="popup-header">
+        <div class="header-title-row">
+          <h1 class="header-title">Settings</h1>
+        </div>
+      </header>
+
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Models</h2>
+          <span id="model-count" class="badge-count">0</span>
+        </div>
+        <div id="models-list" class="models-list"></div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">Add Model</h2>
+        <form id="add-model-form" class="add-model-form">
+          <div class="form-group">
+            <label for="model-name" class="form-label">Model Name</label>
+            <input
+              id="model-name"
+              type="text"
+              class="form-input"
+              placeholder="e.g. gemini-3.5-flash-lite"
+              autocomplete="off"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="model-provider" class="form-label">Provider</label>
+            <select id="model-provider" class="form-select">
+              <option value="gemini">gemini</option>
+              <option value="worker">worker</option>
+            </select>
+          </div>
+
+          <button type="submit" id="submit-btn" class="btn btn-primary">
+            Create Model
+          </button>
+          <div id="form-message" class="form-message"></div>
+        </form>
+      </section>
+    </div>
+    <script type="module" src="./index.ts"></script>
+  </body>
+</html>

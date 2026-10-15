@@ -6,8 +6,10 @@ const manifest: ManifestType = {
   name: pkg.displayName,
   version: pkg.version,
   description: pkg.description,
+  permissions: ["storage"],
   action: {
     default_icon: "icon-34.png",
+    default_popup: "src/popup/index.html",
   },
   icons: {
     "128": "icon-128.png",

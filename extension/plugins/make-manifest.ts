@@ -6,21 +6,27 @@ import colorLog from "./log";
 
 const { resolve } = path;
 
-const outDir = resolve(__dirname, "..", "public");
+const publicDir = resolve(__dirname, "..", "public");
+const distDir = resolve(__dirname, "..", "dist");
 
 export default function makeManifest(): PluginOption {
   return {
     name: "make-manifest",
     buildEnd() {
-      if (!fs.existsSync(outDir)) {
-        fs.mkdirSync(outDir);
+      if (!fs.existsSync(publicDir)) {
+        fs.mkdirSync(publicDir);
       }
 
-      const manifestPath = resolve(outDir, "manifest.json");
-
+      const manifestPath = resolve(publicDir, "manifest.json");
       fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
 
       colorLog(`Manifest file copy complete: ${manifestPath}`, "success");
+    },
+    closeBundle() {
+      if (fs.existsSync(distDir)) {
+        const manifestDistPath = resolve(distDir, "manifest.json");
+        fs.writeFileSync(manifestDistPath, JSON.stringify(manifest, null, 2));
+      }
     },
   };
 }

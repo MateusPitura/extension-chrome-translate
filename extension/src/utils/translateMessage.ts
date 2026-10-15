@@ -1,17 +1,16 @@
-import { Language, Message } from "@src/types";
+import { AIModel, Language, Message, TranslationProvider } from "@src/types";
+import { getSelectedModel } from "./modelStorage";
 
-export type TranslationProvider = "gemini" | "worker";
+export type { TranslationProvider };
 
 const WORKER_URL =
   "https://messages-translator.mateuspitura.workers.dev/translate";
-
-const GEMINI_API_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent";
 
 async function translateWithWorker(
   messages: Message[],
   inputLanguage: Language,
   outputLanguage: Language,
+  modelName: string,
 ): Promise<string> {
   const payload = {
     method: "POST",
@@ -19,7 +18,7 @@ async function translateWithWorker(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "@cf/google/gemma-4-26b-a4b-it",
+      model: modelName,
       inputLanguage,
       outputLanguage,
       messages: messages.map((message) => ({
@@ -46,6 +45,7 @@ async function translateWithGemini(
   messages: Message[],
   inputLanguage: Language,
   outputLanguage: Language,
+  modelName: string,
 ): Promise<string> {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
   if (!apiKey) {
@@ -77,6 +77,8 @@ Instructions:
 - Return only the translated text.
 `.trim();
 
+  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
+
   const payload = {
     method: "POST",
     headers: {
@@ -97,7 +99,7 @@ Instructions:
   };
 
   let responseJson;
-  const response = await fetch(GEMINI_API_URL, payload);
+  const response = await fetch(geminiUrl, payload);
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(`Gemini API error (${response.status}): ${errorText}`);
@@ -118,15 +120,27 @@ export async function translateMessage(
   messages: Message[],
   inputLanguage: Language,
   outputLanguage: Language,
-  provider: TranslationProvider = "gemini",
+  model?: AIModel,
 ): Promise<string> {
-  switch (provider) {
+  const activeModel = model ?? (await getSelectedModel());
+
+  switch (activeModel.provider) {
     case "gemini":
-      return translateWithGemini(messages, inputLanguage, outputLanguage);
+      return translateWithGemini(
+        messages,
+        inputLanguage,
+        outputLanguage,
+        activeModel.name,
+      );
     case "worker":
-      return translateWithWorker(messages, inputLanguage, outputLanguage);
+      return translateWithWorker(
+        messages,
+        inputLanguage,
+        outputLanguage,
+        activeModel.name,
+      );
     default: {
-      throw new Error(`Unsupported translation provider: ${provider}`);
+      throw new Error("Unsupported translation provider");
     }
   }
 }

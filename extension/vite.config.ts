@@ -9,9 +9,7 @@ const publicDir = resolve(__dirname, "public");
 
 export default defineConfig({
   resolve: {
-    alias: {
-      "@src": root,
-    },
+    alias: { "@src": root },
   },
   plugins: [makeManifest(), copyContentStyle()],
   publicDir,
@@ -20,10 +18,10 @@ export default defineConfig({
     sourcemap: process.env.__DEV__ === "true",
     rollupOptions: {
       input: {
-        index: resolve(root, "index.ts"),
+        popup: resolve(root, "popup", "index.html"),
       },
       output: {
-        entryFileNames: () => `src/index.js`,
+        entryFileNames: "src/popup/[name].js",
       },
     },
   },

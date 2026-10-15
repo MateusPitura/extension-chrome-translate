@@ -13,3 +13,10 @@ export enum Language {
   ES = "Spanish [Spain]",
   PT = "Portuguese [Brazil]",
 }
+
+export type TranslationProvider = "gemini" | "worker";
+
+export interface AIModel {
+  name: string;
+  provider: TranslationProvider;
+}
