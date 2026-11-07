@@ -12,10 +12,16 @@ async function translateWithWorker(
   outputLanguage: Language,
   modelName: string,
 ): Promise<string> {
+  const workerApiKey = import.meta.env.VITE_WORKER_API_KEY;
+  if (!workerApiKey) {
+    throw new Error("VITE_WORKER_API_KEY is not set");
+  }
+
   const payload = {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-Worker-Api-Key": workerApiKey,
     },
     body: JSON.stringify({
       model: modelName,
