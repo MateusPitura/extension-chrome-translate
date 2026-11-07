@@ -7,7 +7,8 @@ export default function Empty() {
       <Text style={styles.emptyTitle}>No messages yet</Text>
       <Text style={styles.emptyText}>
         In WhatsApp, select two or more messages and copy them, then come back
-        here. A single message copied is ignored.
+        here. A single message copied is ignored. To transcribe a voice message,
+        share it from WhatsApp to this app
       </Text>
     </View>
   );

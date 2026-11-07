@@ -8,11 +8,13 @@ async function translateWithWorker(
   inputLanguage: Language,
   outputLanguage: Language,
   modelName: string,
+  workerApiKey: string,
 ): Promise<string> {
   const payload = {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-Worker-Api-Key": workerApiKey,
     },
     body: JSON.stringify({
       model: modelName,
@@ -117,6 +119,7 @@ export async function translateMessage(
   outputLanguage: Language,
   model: AIModel,
   apiKey: string,
+  workerApiKey: string,
 ): Promise<string> {
   if (model.provider === "gemini") {
     return translateWithGemini(
@@ -132,6 +135,7 @@ export async function translateMessage(
       inputLanguage,
       outputLanguage,
       model.name,
+      workerApiKey,
     );
   }
 

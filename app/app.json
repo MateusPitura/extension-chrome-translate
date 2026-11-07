@@ -4,6 +4,8 @@
     "slug": "chat-translator",
     "version": "1.0.0",
     "orientation": "portrait",
+    "scheme": "chat-translator",
+    "plugins": [["expo-share-intent", { "androidIntentFilters": ["audio/*", "application/ogg"] }]],
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "android": {
@@ -15,6 +17,9 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.mateuspitura.chattranslator"
+    },
+    "ios": {
+      "bundleIdentifier": "com.mateuspitura.chattranslator"
     },
     "extra": {
       "eas": {

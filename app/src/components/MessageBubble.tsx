@@ -16,6 +16,7 @@ interface Props {
   loading: boolean;
   dayLabel?: string;
   onTranslate: (id: string) => void;
+  onTranscribe: (id: string) => void;
   onDelete: (id: string) => void;
 }
 
@@ -26,7 +27,8 @@ export default function MessageBubble({
   loading,
   dayLabel,
   onTranslate,
-  onDelete
+  onTranscribe,
+  onDelete,
 }: Props) {
   return (
     <View>
@@ -58,9 +60,19 @@ export default function MessageBubble({
           {loading ? (
             <ActivityIndicator size="small" color={colors.translation} />
           ) : (
-            <Pressable onPress={() => onTranslate(message.id)} hitSlop={10}>
-              <Text style={styles.translateButton}>Translate</Text>
-            </Pressable>
+            <>
+              {message.audioUri && (
+                <Pressable
+                  onPress={() => onTranscribe(message.id)}
+                  hitSlop={10}
+                >
+                  <Text style={styles.translateButton}>Transcribe</Text>
+                </Pressable>
+              )}
+              <Pressable onPress={() => onTranslate(message.id)} hitSlop={10}>
+                <Text style={styles.translateButton}>Translate</Text>
+              </Pressable>
+            </>
           )}
           <Text style={styles.time}>{formatTime(message.timestamp)}</Text>
         </View>

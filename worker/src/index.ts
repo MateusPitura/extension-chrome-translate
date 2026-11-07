@@ -1,9 +1,10 @@
 import { translate } from "./translate";
+import { transcribe } from "./transcribe";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, X-Worker-Api-Key",
 };
 
 function withCors(response: Response): Response {
@@ -31,8 +32,19 @@ export default {
       });
     }
 
+    if (
+      (url.pathname === "/translate" || url.pathname === "/transcribe") &&
+      (!env.WORKER_API_KEY || request.headers.get("X-Worker-Api-Key") !== env.WORKER_API_KEY)
+    ) {
+      return withCors(Response.json({ error: "Unauthorized" }, { status: 401 }));
+    }
+
     if (request.method === "POST" && url.pathname === "/translate") {
       return withCors(await translate(request, env));
+    }
+
+    if (request.method === "POST" && url.pathname === "/transcribe") {
+      return withCors(await transcribe(request, env));
     }
 
     return withCors(

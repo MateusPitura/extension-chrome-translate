@@ -8,6 +8,9 @@
     "enabled": true,
   },
   "upload_source_maps": true,
+  "secrets": {
+    "required": ["WORKER_API_KEY"],
+  },
   "ai": {
     "binding": "AI",
   },

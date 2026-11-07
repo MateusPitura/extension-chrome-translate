@@ -11,19 +11,23 @@ import {
   View,
 } from "react-native";
 import { colors } from "../constants/theme";
-import type { AIModel, TranslationProvider } from "../types";
+import type { AIModel, ModelPurpose, TranslationProvider } from "../types";
 
 interface SettingsModalProps {
   visible: boolean;
   onClose: () => void;
   apiKey: string;
   onUpdateApiKey: (key: string) => void;
+  workerApiKey: string;
+  onUpdateWorkerApiKey: (key: string) => void;
   models: AIModel[];
+  transcribeModels: AIModel[];
   selectedModel: AIModel;
-  onSelectModel: (model: AIModel) => void;
-  onAddModel: (model: AIModel) => Promise<boolean>;
-  onUpdateModel: (index: number, model: AIModel) => Promise<boolean>;
-  onDeleteModel: (index: number) => void;
+  selectedTranscribeModel: AIModel;
+  onSelectModel: (purpose: ModelPurpose, model: AIModel) => void;
+  onAddModel: (purpose: ModelPurpose, model: AIModel) => Promise<boolean>;
+  onUpdateModel: (purpose: ModelPurpose, index: number, model: AIModel) => Promise<boolean>;
+  onDeleteModel: (purpose: ModelPurpose, index: number) => void;
 }
 
 export default function SettingsModal({
@@ -31,8 +35,12 @@ export default function SettingsModal({
   onClose,
   apiKey,
   onUpdateApiKey,
+  workerApiKey,
+  onUpdateWorkerApiKey,
   models,
+  transcribeModels,
   selectedModel,
+  selectedTranscribeModel,
   onSelectModel,
   onAddModel,
   onUpdateModel,
@@ -41,20 +49,23 @@ export default function SettingsModal({
   const [modelName, setModelName] = useState("");
   const [modelProvider, setModelProvider] =
     useState<TranslationProvider>("gemini");
+  const [modelPurpose, setModelPurpose] = useState<ModelPurpose>("translate");
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   const resetForm = () => {
     setModelName("");
     setModelProvider("gemini");
+    setModelPurpose("translate");
     setEditingIndex(null);
   };
 
-  const handleStartEdit = (index: number) => {
-    const target = models[index];
+  const handleStartEdit = (purpose: ModelPurpose, index: number) => {
+    const target = (purpose === "translate" ? models : transcribeModels)[index];
     if (!target) return;
     setEditingIndex(index);
     setModelName(target.name);
     setModelProvider(target.provider);
+    setModelPurpose(purpose);
   };
 
   const handleCancelEdit = () => {
@@ -63,13 +74,13 @@ export default function SettingsModal({
 
   const handleSaveModel = async () => {
     if (editingIndex !== null) {
-      const ok = await onUpdateModel(editingIndex, {
+      const ok = await onUpdateModel(modelPurpose, editingIndex, {
         name: modelName,
         provider: modelProvider,
       });
       if (ok) resetForm();
     } else {
-      const ok = await onAddModel({
+      const ok = await onAddModel(modelPurpose, {
         name: modelName,
         provider: modelProvider,
       });
@@ -107,30 +118,19 @@ export default function SettingsModal({
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
           >
-            {/* API Key Section */}
-            <View style={styles.section}>
-              <Text style={styles.sectionLabel}>GEMINI API KEY</Text>
-              <TextInput
-                style={styles.input}
-                value={apiKey}
-                onChangeText={onUpdateApiKey}
-                placeholder="Insert Gemini API Key"
-                placeholderTextColor={colors.muted}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-
             {/* Models CRUD Section */}
             <View style={styles.section}>
+              {(["translate", "transcribe"] as const).map((purpose) => {
+                const list = purpose === "translate" ? models : transcribeModels;
+                const selected = purpose === "translate" ? selectedModel : selectedTranscribeModel;
+                return <View key={purpose} style={styles.modelSection}>
               <View style={styles.sectionHeaderRow}>
-                <Text style={styles.sectionLabel}>MODELS</Text>
+                <Text style={styles.sectionLabel}>{purpose === "translate" ? "TRANSLATE MODELS" : "TRANSCRIBE MODELS"}</Text>
               </View>
 
-              {/* Model List */}
               <View style={styles.modelList}>
-                {models.map((model, index) => {
-                  const isActive = selectedModel.name === model.name;
+                {list.map((model, index) => {
+                  const isActive = selected.name === model.name && selected.provider === model.provider;
                   return (
                     <View
                       key={`${model.name}-${index}`}
@@ -141,7 +141,7 @@ export default function SettingsModal({
                     >
                       <Pressable
                         style={styles.modelInfo}
-                        onPress={() => onSelectModel(model)}
+                        onPress={() => onSelectModel(purpose, model)}
                       >
                         <View style={styles.nameRow}>
                           <Text
@@ -177,14 +177,14 @@ export default function SettingsModal({
                       <View style={styles.actions}>
                         <Pressable
                           hitSlop={8}
-                          onPress={() => handleStartEdit(index)}
+                          onPress={() => handleStartEdit(purpose, index)}
                           style={styles.actionButton}
                         >
                           <Text style={styles.editAction}>Edit</Text>
                         </Pressable>
                         <Pressable
                           hitSlop={8}
-                          onPress={() => onDeleteModel(index)}
+                          onPress={() => onDeleteModel(purpose, index)}
                           style={styles.actionButton}
                         >
                           <Text style={styles.deleteAction}>Delete</Text>
@@ -194,12 +194,22 @@ export default function SettingsModal({
                   );
                 })}
               </View>
+              </View>;
+              })}
 
               {/* Add / Edit Form */}
               <View style={styles.formCard}>
                 <Text style={styles.formTitle}>
-                  {editingIndex !== null ? "Edit Model" : "Add Model"}
+                  {editingIndex !== null ? `Edit ${modelPurpose} model` : `Add ${modelPurpose} model`}
                 </Text>
+
+                {editingIndex === null && <View style={styles.providerRow}>
+                  <View style={styles.providerButtons}>
+                    {(["translate", "transcribe"] as const).map((purpose) => <Pressable key={purpose} style={[styles.providerButton, modelPurpose === purpose && styles.providerButtonActive]} onPress={() => setModelPurpose(purpose)}>
+                      <Text style={[styles.providerButtonText, modelPurpose === purpose && styles.providerButtonTextActive]}>{purpose}</Text>
+                    </Pressable>)}
+                  </View>
+                </View>}
 
                 <TextInput
                   style={styles.input}
@@ -266,11 +276,35 @@ export default function SettingsModal({
                     onPress={handleSaveModel}
                   >
                     <Text style={styles.submitButtonText}>
-                      {editingIndex !== null ? "Save" : "Add Model"}
+                      {editingIndex !== null ? "Save" : `Add ${modelPurpose} model`}
                     </Text>
                   </Pressable>
                 </View>
               </View>
+            </View>
+
+             {/* API Key Section */}
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>GEMINI API KEY</Text>
+              <TextInput
+                style={styles.input}
+                value={apiKey}
+                onChangeText={onUpdateApiKey}
+                placeholder="Insert Gemini API Key"
+                placeholderTextColor={colors.muted}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              <Text style={styles.sectionLabel}>WORKER API KEY</Text>
+              <TextInput
+                style={styles.input}
+                value={workerApiKey}
+                onChangeText={onUpdateWorkerApiKey}
+                placeholder="Insert Worker API Key"
+                placeholderTextColor={colors.muted}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
             </View>
           </ScrollView>
         </View>
@@ -332,6 +366,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 0.8,
     marginBottom: 8,
+    marginTop: 8,
   },
   hintText: {
     color: colors.muted,
@@ -347,6 +382,9 @@ const styles = StyleSheet.create({
   },
   modelList: {
     marginBottom: 12,
+  },
+  modelSection: {
+    marginBottom: 10,
   },
   modelItem: {
     flexDirection: "row",

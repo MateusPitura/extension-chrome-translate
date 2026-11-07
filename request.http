@@ -1,9 +1,12 @@
+@workerApiKey = WORKER_API_KEY
+
 ###
 POST https://messages-translator.mateuspitura.workers.dev/translate HTTP/1.1
 content-type: application/json
+X-Worker-Api-Key: {{workerApiKey}}
 
 {
-    "model": "@cf/openai/gpt-oss-120b",
+    "model": "@cf/google/gemma-4-26b-a4b-it",
     "inputLanguage": "Spanish [Spain]",
     "outputLanguage": "Portuguese [Brazil]",
     "messages": [
@@ -20,4 +23,15 @@ content-type: application/json
         "text": "Estoy bien también. ¿Qué has estado haciendo últimamente?"
       }
     ]
+}
+
+###
+POST https://messages-translator.mateuspitura.workers.dev/transcribe HTTP/1.1
+content-type: application/json
+X-Worker-Api-Key: {{workerApiKey}}
+
+{
+  "model": "@cf/openai/whisper-large-v3-turbo",
+  "fileName": "voice.oga",
+  "audioBase64": "<base64-encoded-audio>"
 }

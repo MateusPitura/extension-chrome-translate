@@ -4,9 +4,16 @@ export const MAIN_MEMBER_NAME = process.env.EXPO_PUBLIC_MAIN_MEMBER_NAME ?? "";
 
 export const WORKER_URL =
   "https://messages-translator.mateuspitura.workers.dev/translate";
+export const TRANSCRIBE_WORKER_URL =
+  "https://messages-translator.mateuspitura.workers.dev/transcribe";
 
 export const DEFAULT_MODELS: AIModel[] = [
   { name: "@cf/google/gemma-4-26b-a4b-it", provider: "worker" },
+  { name: "gemini-3.5-flash-lite", provider: "gemini" },
+];
+
+export const DEFAULT_TRANSCRIBE_MODELS: AIModel[] = [
+  { name: "@cf/openai/whisper-large-v3-turbo", provider: "worker" },
   { name: "gemini-3.5-flash-lite", provider: "gemini" },
 ];
 
