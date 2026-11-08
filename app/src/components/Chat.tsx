@@ -16,6 +16,7 @@ import {
 } from "../constants/config";
 import { colors } from "../constants/theme";
 import { useChat } from "../hooks/useChat";
+import { useAudioPlayer as useAudioPlayback } from "../hooks/useAudioPlayer";
 import { dayKey, formatDay, isMine, translationKey } from "../utils";
 import { Composer } from "./Composer";
 import Empty from "./Empty";
@@ -26,6 +27,7 @@ import { useAudioShare } from "../hooks/useAudioShare";
 export default function Chat() {
   const insets = useSafeAreaInsets();
   const [settingsVisible, setSettingsVisible] = useState(false);
+  const { playingId, isLoading: audioLoading, togglePlay } = useAudioPlayback();
 
   const {
     messages,
@@ -114,7 +116,7 @@ export default function Chat() {
             data={data}
             inverted
             keyExtractor={(message) => message.id}
-            extraData={[translations, pending]}
+            extraData={[translations, pending, playingId, audioLoading]}
             keyboardShouldPersistTaps="handled"
             renderItem={({ item, index }) => {
               const previous = data[index + 1];
@@ -137,6 +139,9 @@ export default function Chat() {
                   }
                   loading={!!pending[item.id]}
                   dayLabel={newDay ? formatDay(item.timestamp) : undefined}
+                  playingId={playingId}
+                  audioLoading={audioLoading}
+                  onPlay={togglePlay}
                   onTranslate={translateReceived}
                   onTranscribe={transcribeReceived}
                   onDelete={deleteReceived}

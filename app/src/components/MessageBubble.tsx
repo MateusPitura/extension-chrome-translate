@@ -15,6 +15,9 @@ interface Props {
   translation?: string;
   loading: boolean;
   dayLabel?: string;
+  playingId: string | null;
+  audioLoading: boolean;
+  onPlay: (id: string, uri: string) => Promise<void>;
   onTranslate: (id: string) => void;
   onTranscribe: (id: string) => void;
   onDelete: (id: string) => void;
@@ -26,10 +29,14 @@ export default function MessageBubble({
   translation,
   loading,
   dayLabel,
+  playingId,
+  audioLoading,
+  onPlay,
   onTranslate,
   onTranscribe,
   onDelete,
 }: Props) {
+  const isThisPlaying = playingId === message.id;
   return (
     <View>
       {dayLabel ? (
@@ -62,12 +69,23 @@ export default function MessageBubble({
           ) : (
             <>
               {message.audioUri && (
-                <Pressable
-                  onPress={() => onTranscribe(message.id)}
-                  hitSlop={10}
-                >
-                  <Text style={styles.translateButton}>Transcribe</Text>
-                </Pressable>
+                <>
+                  <Pressable
+                    onPress={() => onPlay(message.id, message.audioUri!)}
+                    hitSlop={10}
+                    disabled={audioLoading}
+                  >
+                    <Text style={[styles.translateButton, styles.playButton]}>
+                      {isThisPlaying ? "⏹ Stop" : "▶ Play"}
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => onTranscribe(message.id)}
+                    hitSlop={10}
+                  >
+                    <Text style={styles.translateButton}>Transcribe</Text>
+                  </Pressable>
+                </>
               )}
               <Pressable onPress={() => onTranslate(message.id)} hitSlop={10}>
                 <Text style={styles.translateButton}>Translate</Text>
@@ -144,6 +162,10 @@ const styles = StyleSheet.create({
     color: colors.translation,
     fontSize: 12,
     fontWeight: "600",
+  },
+  playButton: {
+    color: colors.mine === "#dcf8c6" ? "#128c7e" : colors.translation,
+    letterSpacing: 0.3,
   },
   time: { color: colors.muted, fontSize: 12 },
 });
